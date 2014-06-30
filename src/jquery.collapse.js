@@ -15,14 +15,15 @@
   function Collapse (el, options) {
     options = options || {};
     var _this = this,
-      query = options.query || "> :even";
+        query = options.query || "> :even";
 
     $.extend(_this, {
       $el: el,
       options : options,
       sections: [],
       isAccordion : options.accordion || false,
-      db : options.persist ? jQueryCollapseStorage(el.get(0).id) : false
+      db : options.persist ? jQueryCollapseStorage(el.get(0).id) : false,
+      query: query
     });
 
     // Figure out what sections are open if storage is used
@@ -36,12 +37,12 @@
 
     // Capute ALL the clicks!
     (function(scope) {
-      _this.$el.on("click", "[data-collapse-summary] " + (scope.options.clickQuery || ""),
+      _this.$el.on("click.collapse", "[data-collapse-summary] "
+                             + (scope.options.clickQuery || ""),
         $.proxy(_this.handleClick, scope));
 
       _this.$el.bind("toggle close open",
         $.proxy(_this.handleEvent, scope));
-
     }(_this));
   }
 
@@ -54,7 +55,6 @@
       while(l--) {
         if($.contains(sections[l].$summary[0], e.target)) {
           sections[l][state]();
-          break;
         }
       }
     },
@@ -75,6 +75,17 @@
       if(isFinite(eq)) return this.sections[eq][action]();
       $.each(this.sections, function(i, section) {
         section[action]();
+      });
+    },
+    update: function(){
+      // Check if new sections have been added to the element and
+      // bind the new Section objects to them
+      var currentLength = this.sections.length,
+        _this = this;
+      this.$el.find(this.query).each(function(index) {
+        if (index >= currentLength){
+          new jQueryCollapseSection($(this), _this);
+        }
       });
     }
   };
@@ -104,6 +115,7 @@
     } else {
       this.close(true);
     }
+    return this;
   }
 
   Section.prototype = {
