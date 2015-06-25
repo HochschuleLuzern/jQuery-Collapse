@@ -9,7 +9,20 @@
  * Released under the MIT, BSD, and GPL Licenses.
  */
 
-(function($, exports) {
+/* global window, document, define, jQuery, setInterval, clearInterval */
+(function(root, factory) {
+    'use strict';
+    if (typeof define === 'function' && define.amd) {
+        define(['jquery'], factory);
+    } else if (typeof exports !== 'undefined') {
+        module.exports = factory(require('jquery'));
+    } else {
+      var returnExports = factory(root.jQuery);
+      root.jQueryCollapse = returnExports.jQueryCollapse;
+      root.jQueryCollapseSection = returnExports.jQueryCollapseSection;
+    }
+
+}(this, function($) {
 
   // Constructor
   function Collapse (el, options) {
@@ -160,14 +173,14 @@
     }
   });
 
-  // Expose constructor to
-  // global namespace
-  exports.jQueryCollapse = Collapse;
-  exports.jQueryCollapseSection = Section;
-  
   //jQuery DOM Ready
   $(function() {
     $.fn.collapse(false, true);
   });
 
-})(window.jQuery, window);
+  return {
+    jQueryCollapse: Collapse,
+    jQueryCollapseSection: Section
+  };
+
+}));
