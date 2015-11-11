@@ -103,6 +103,7 @@
       parent: parent
     });
     parent.sections.push(this);
+    $el.parent().attr('data-collapse-index', this._index());
 
     // Check current state of section
     var state = parent.states[this._index()];
